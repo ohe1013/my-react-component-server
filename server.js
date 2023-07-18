@@ -2,6 +2,7 @@ import { createServer } from "http";
 import { readFile, readdir } from "fs/promises";
 import escapeHtml from "escape-html";
 import { URL } from "url";
+import { renderToString } from 'react-dom/server';
 import sanitizeFilename from "sanitize-filename";
 createServer(async (req, res) => {
   try {
@@ -155,8 +156,8 @@ async function sendScript(res, filename) {
   res.end(content);
 }
 async function sendHTML(res, jsx) {
-  let html = await renderJSXToHTML(jsx);
   const clientJSX = await renderJSXToClientJSX(jsx);
+  let html = renderToString(clientJSX);
   const clientJSXString = JSON.stringify(clientJSX, stringifyJSX);
   html += `<script>window.__INITIAL_CLIENT_JSX_STRING__ = `;
   html += JSON.stringify(clientJSXString).replace(/</g, "\\u003c");
